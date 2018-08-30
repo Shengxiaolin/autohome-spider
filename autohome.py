@@ -44,15 +44,14 @@ def CarInfo():
 
 if __name__ == '__main__':
 
-    dir_format = 'E:\\autohome-t\\{}\\{}\\{}\\{}'
+    dir_format = '/home/sxl/linsws/{}/{}/{}/{}'
 
     for car in CarInfo():
         url = 'http:{}'.format(car['pic'])
         dirname = dir_format.format(car['brand name'],
                                     car['factory name'],
                                     car['car name'],
-                                    car['car detail'],
-                                    car['pic'])
+                                    car['car detail'])
         filename = os.path.join(dirname, car['pic'].split('/')[-1])
 
         if os.path.exists(dirname) is False:
