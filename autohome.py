@@ -54,6 +54,13 @@ if __name__ == '__main__':
                                     car['car detail'],
                                     car['pic'])
         filename = os.path.join(dirname, car['pic'].split('/')[-1])
+		
+		if os.path.exists(dirname) is False:
+			os.makedirs(dirname)
+
+		if os.path.exists(filename) is True:
+		    print('{} is existed.'.format(filename))
+		    continue
 
         with closing(requests.get(url, stream=True)) as response:
             chunk_size = 1024
@@ -66,18 +73,10 @@ if __name__ == '__main__':
                                        , run_status="正在下载"
                                        , fin_status="下载完成")
 
-                if os.path.exists(dirname) is False:
-                    os.makedirs(dirname)
-
-                # if os.path.exists(filename) is True:
-                #     print('{} is existed.'.format(filename))
-                #     continue
-
                 with open(filename, 'wb') as file:
                     for data in response.iter_content(chunk_size=chunk_size):
                         file.write(data)
                         progress.refresh(count=len(data))
-
             else:
                 print('链接异常:', url)
 
