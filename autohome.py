@@ -7,9 +7,12 @@ from contextlib import closing
 # url = 'https://www.autohome.com.cn/grade/carhtml/A.html'
 
 def CarInfo():
+
     brand_url = 'http://www.autohome.com.cn/ashx/AjaxIndexCarFind.ashx?type=1'
     series_url = 'http://www.autohome.com.cn/ashx/AjaxIndexCarFind.ashx?type=3&value={}'
-    car_url = 'https://car.autohome.com.cn/pic/series/{}-1-p{}.html'
+    # car_url = 'https://car.autohome.com.cn/pic/series/{}-1-p{}.html'  # 在售车型
+    car_url = 'https://car.autohome.com.cn/pic/series-t/{}-1-p{}.html'  # 停产车型
+
     brand_json = requests.get(brand_url).json()
     for brand in brand_json['result']['branditems']:
         car_info = dict()
@@ -18,13 +21,14 @@ def CarInfo():
         for factory in series_json['result']['factoryitems']:
             car_info['factory name'] = factory['name']
             for series in factory['seriesitems']:
-                car_info['car id'] = series['id']
+                # car_info['car id'] = series['id']
                 car_info['car name'] = series['name']
                 page = 1
                 while True:
                     car_html = requests.get(car_url.format(series['id'], page)).text
                     div_bs = BeautifulSoup(car_html, 'lxml')
-                    div = div_bs.findAll('div', attrs={'class': 'uibox-con carpic-list03 border-b-solid'})
+                    # div = div_bs.findAll('div', attrs={'class': 'uibox-con carpic-list03 border-b-solid'})  #在售车型
+                    div = div_bs.findAll('div', attrs={'class': 'uibox-con carpic-list03'})  # 停产车型
                     images_bs = BeautifulSoup(str(div), 'lxml')
                     images = images_bs.findAll('img')
 
@@ -33,14 +37,14 @@ def CarInfo():
 
                     for image in images:
                         car_info['car detail'] = image['title'].strip(' ')
-                        car_info['pic'] = image['src'].replace('t_autohomecar', '1024x0_1_q87_autohomecar')
+                        car_info['pic'] = image['src'].replace('t_', '1024x0_1_q87_', 1)
                         yield car_info
                     page += 1
 
 
 if __name__ == '__main__':
 
-    dir_format = 'E:\\autohome\\{}\\{}\\{}\\{}'
+    dir_format = 'E:\\autohome-t\\{}\\{}\\{}\\{}'
 
     for car in CarInfo():
         url = 'http:{}'.format(car['pic'])
@@ -55,7 +59,6 @@ if __name__ == '__main__':
             chunk_size = 1024
             content_size = int(response.headers['content-length'])
             if response.status_code == 200:
-                # print('文件大小:%0.2f KB' % (content_size / chunk_size))
                 progress = ProgressBar("%s下载进度" % filename
                                        , total=content_size
                                        , unit="KB"
@@ -65,11 +68,12 @@ if __name__ == '__main__':
 
                 if os.path.exists(dirname) is False:
                     os.makedirs(dirname)
+
                 # if os.path.exists(filename) is True:
                 #     print('{} is existed.'.format(filename))
                 #     continue
 
-                with open(filename, "wb") as file:
+                with open(filename, 'wb') as file:
                     for data in response.iter_content(chunk_size=chunk_size):
                         file.write(data)
                         progress.refresh(count=len(data))
