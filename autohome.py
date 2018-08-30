@@ -14,7 +14,7 @@ def CarInfo():
     car_url = 'https://car.autohome.com.cn/pic/series-t/{}-1-p{}.html'  # 停产车型
 
     brand_json = requests.get(brand_url).json()
-    for brand in brand_json['result']['branditems']:
+    for brand in brand_json['result']['branditems'][22:]:
         car_info = dict()
         car_info['brand name'] = brand['name']
         series_json = requests.get(series_url.format(brand['id'])).json()
@@ -54,13 +54,13 @@ if __name__ == '__main__':
                                     car['car detail'],
                                     car['pic'])
         filename = os.path.join(dirname, car['pic'].split('/')[-1])
-		
-		if os.path.exists(dirname) is False:
-			os.makedirs(dirname)
 
-		if os.path.exists(filename) is True:
-		    print('{} is existed.'.format(filename))
-		    continue
+        if os.path.exists(dirname) is False:
+            os.makedirs(dirname)
+
+        if os.path.exists(filename) is True:
+            print('{} is existed.'.format(filename))
+            continue
 
         with closing(requests.get(url, stream=True)) as response:
             chunk_size = 1024
@@ -77,6 +77,7 @@ if __name__ == '__main__':
                     for data in response.iter_content(chunk_size=chunk_size):
                         file.write(data)
                         progress.refresh(count=len(data))
+
             else:
                 print('链接异常:', url)
 
