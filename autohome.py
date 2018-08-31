@@ -14,7 +14,7 @@ def CarInfo():
     car_url = 'https://car.autohome.com.cn/pic/series-t/{}-1-p{}.html'  # 停产车型
 
     brand_json = requests.get(brand_url).json()
-    for brand in brand_json['result']['branditems'][22:]:
+    for brand in brand_json['result']['branditems'][199:201]:
         car_info = dict()
         car_info['brand name'] = brand['name']
         series_json = requests.get(series_url.format(brand['id'])).json()
@@ -44,7 +44,7 @@ def CarInfo():
 
 if __name__ == '__main__':
 
-    dir_format = '/home/sxl/linsws/{}/{}/{}/{}'
+    dir_format = 'D:\\autohome-t\\{}\\{}\\{}\\{}'
 
     for car in CarInfo():
         url = 'http:{}'.format(car['pic'])
@@ -54,8 +54,11 @@ if __name__ == '__main__':
                                     car['car detail'])
         filename = os.path.join(dirname, car['pic'].split('/')[-1])
 
-        if os.path.exists(dirname) is False:
-            os.makedirs(dirname)
+        try:
+            if os.path.exists(dirname) is False:
+                os.makedirs(dirname)
+        except NotADirectoryError:
+            continue
 
         if os.path.exists(filename) is True:
             print('{} is existed.'.format(filename))
