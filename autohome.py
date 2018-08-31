@@ -14,7 +14,7 @@ def CarInfo():
     car_url = 'https://car.autohome.com.cn/pic/series-t/{}-1-p{}.html'  # 停产车型
 
     brand_json = requests.get(brand_url).json()
-    for brand in brand_json['result']['branditems'][199:201]:
+    for brand in brand_json['result']['branditems'][0:201]:
         car_info = dict()
         car_info['brand name'] = brand['name']
         series_json = requests.get(series_url.format(brand['id'])).json()
